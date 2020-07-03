@@ -52,7 +52,6 @@ client.on('message', async msg => {
     if (msg.body == '!ping reply') {
         // Send a new message as a reply to the current one
         msg.reply('pong');
-
     } else if (msg.body == '!ping') {
         // Send a new message to the same chat
         client.sendMessage(msg.from, 'pong');
@@ -91,6 +90,7 @@ client.on('message', async msg => {
         let chat = await msg.getChat();
         console.log(chat);
         if (chat.isGroup) {
+            /*
             msg.reply(`
                 *Group Details*
                 Name: ${chat.name}
@@ -99,7 +99,19 @@ client.on('message', async msg => {
                 Created By: ${chat.owner.user}
                 Participant count: ${chat.participants.length}
             `);
-
+            */
+            const botno = msg.to.split('@')[0];
+            var participants = {};
+            for (let participant of chat.participants) {
+                if (participant.id.user == botno) { continue; }
+                // participants.push(participant.id.user);
+                const contact = await client.getContactById(participant.id._serialized);
+                participants[contact.pushname] = participant.id.user;
+                // participant needs to send a message for it to be defined
+            }
+            console.log('Group Details');
+            console.log('Name: ', chat.name);
+            console.log('Participants: ', participants);
         } else {
             msg.reply('This command can only be used in a group!');
         }
@@ -123,10 +135,10 @@ client.on('group_join', async (notification) => {
     }
     var participants = {};
     var admins = {};
-    var i;
+    var i
     for (let participant of chat.participants) {
         if (participant.id.user == botno) { continue; }
-        //participants.push(participant.id.user);
+        // participants.push(participant.id.user);
         const contact = await client.getContactById(participant.id._serialized);
         participants[contact.pushname] = participant.id.user;
         // participant needs to send a message for it to be defined
